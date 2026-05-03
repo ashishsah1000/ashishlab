@@ -111,11 +111,22 @@ export default function NewLabNotePage() {
               />
             </div>
 
-            <div className="pt-6">
+            <div className="pt-6 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="w-full md:w-64 space-y-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-900">Admin Password <span className="text-red-500">*</span></label>
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  required
+                  placeholder="Enter password to publish" 
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full md:w-auto px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full md:w-auto mt-auto px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed h-[52px]"
               >
                 {loading ? "Publishing..." : "Publish Note"}
               </button>

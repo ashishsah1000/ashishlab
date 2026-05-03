@@ -28,8 +28,8 @@ export default function Hero() {
             </div>
             
             <h1 className="text-6xl md:text-8xl font-heading font-black tracking-tight text-gray-900 mb-6 leading-[1.1]">
-              AI, <span className="inline-flex items-center gap-2 md:gap-4">Mountains <MountainSnow className="w-10 h-10 md:w-16 md:h-16 text-gray-400 -mt-2" /></span>,<br />
-              <span className="text-gradient inline-flex items-center gap-2 md:gap-4">and Cosmos. <Rocket className="w-10 h-10 md:w-16 md:h-16 text-blue-500 -mt-2" /></span>
+              Beyond <span className="inline-flex items-center gap-2 md:gap-4">Mountains and</span><br />
+              <span className="text-gradient inline-flex items-center gap-2 md:gap-4"> Cosmos. </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 font-light mb-10 max-w-2xl leading-relaxed">
@@ -73,7 +73,7 @@ export default function Hero() {
           </div>
           
           <div className="bg-white/60 backdrop-blur-xl border border-white/50 shadow-sm p-8 rounded-3xl group cursor-pointer hover:bg-gray-900 transition-colors">
-            <a href="/Ashish resume 26-05.pdf" target="_blank" rel="noopener noreferrer" className="block">
+            <a href="/api/resume/download" target="_blank" rel="noopener noreferrer" className="block">
               <h3 className="text-gray-500 group-hover:text-gray-400 text-sm font-medium uppercase tracking-widest mb-2 transition-colors">Curriculum Vitae</h3>
               <div className="flex items-center justify-between">
                 <p className="text-2xl font-bold text-gray-900 group-hover:text-white font-heading transition-colors">Download Resume</p>

@@ -11,6 +11,11 @@ export async function createLabnote(formData: FormData) {
   const content = formData.get("content") as string;
   const imageUrl = formData.get("imageUrl") as string;
   const tags = formData.get("tags") as string;
+  const password = formData.get("password") as string;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    throw new Error("Invalid admin password");
+  }
 
   if (!title || !content) {
     throw new Error("Title and content are required");
