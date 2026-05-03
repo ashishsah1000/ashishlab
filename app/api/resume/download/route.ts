@@ -14,9 +14,9 @@ export async function GET() {
     const stream = await renderToStream(React.createElement(ResumePDF, { about, experience, projects, skills }));
     
     // Read stream to buffer
-    const chunks = [];
+    const chunks: Uint8Array[] = [];
     for await (const chunk of stream) {
-      chunks.push(chunk);
+      chunks.push(chunk as Uint8Array);
     }
     const pdfBuffer = Buffer.concat(chunks);
 
