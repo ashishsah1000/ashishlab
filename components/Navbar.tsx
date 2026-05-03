@@ -28,13 +28,14 @@ export default function Navbar() {
           </Link>
           
           <div className="hidden md:flex items-center gap-8 font-medium text-sm text-gray-600">
-            <Link href="#about" className="hover:text-gray-900 transition-colors">About</Link>
-            <Link href="#skills" className="hover:text-gray-900 transition-colors">Skills</Link>
-            <Link href="#experience" className="hover:text-gray-900 transition-colors">Experience</Link>
-            <Link href="#projects" className="hover:text-gray-900 transition-colors">Projects</Link>
+            <Link href="/#about" className="hover:text-gray-900 transition-colors">About</Link>
+            <Link href="/#skills" className="hover:text-gray-900 transition-colors">Skills</Link>
+            <Link href="/#experience" className="hover:text-gray-900 transition-colors">Experience</Link>
+            <Link href="/#projects" className="hover:text-gray-900 transition-colors">Projects</Link>
+            <Link href="/labnotes" className="hover:text-gray-900 transition-colors">Lab Notes</Link>
           </div>
           
-          <Link href="#contact" className="px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm">
+          <Link href="/#contact" className="px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm">
             Contact
           </Link>
         </div>
