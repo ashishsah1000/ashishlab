@@ -1,39 +1,53 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SectionHeading } from "./ui/SectionHeading";
+import { Code2, Database, Globe2, LayoutTemplate } from "lucide-react";
 
 const skillCategories = [
   {
-    title: "Frontend Development",
-    skills: ["React.js", "Next.js", "TypeScript", "JavaScript", "Tailwind CSS", "Redux", "Figma", "Antd"]
+    title: "Frontend",
+    icon: <LayoutTemplate className="w-8 h-8" />,
+    skills: ["React.js", "Next.js", "TypeScript", "Tailwind CSS", "Redux", "Antd"],
+    color: "bg-pink-50 text-pink-600",
+    border: "border-pink-100"
   },
   {
     title: "Backend & Systems",
-    skills: ["Node.js", "Rust", "Python", "Express.js", "Fast API", "Hapi JS", "Rust Axum", "Django"]
+    icon: <Code2 className="w-8 h-8" />,
+    skills: ["Node.js", "Rust", "Python", "Express.js", "FastAPI", "Rust Axum"],
+    color: "bg-blue-50 text-blue-600",
+    border: "border-blue-100"
   },
   {
     title: "Geospatial & 3D",
-    skills: ["Cesium JS", "Three JS", "OpenLayers", "Leaflet JS", "Potree", "Rasterio", "Photogrammetry"]
+    icon: <Globe2 className="w-8 h-8" />,
+    skills: ["Cesium JS", "Three JS", "OpenLayers", "Potree", "Photogrammetry"],
+    color: "bg-teal-50 text-teal-600",
+    border: "border-teal-100"
   },
   {
     title: "Databases & Tools",
-    skills: ["MongoDB", "PostgreSQL", "Docker", "Jest", "Grafana", "dexDB", "PyMavlink"]
+    icon: <Database className="w-8 h-8" />,
+    skills: ["MongoDB", "PostgreSQL", "Docker", "Jest", "Grafana"],
+    color: "bg-violet-50 text-violet-600",
+    border: "border-violet-100"
   }
 ];
 
 export default function Skills() {
   return (
-    <section id="skills" className="py-20 px-6 md:px-12 lg:px-24 border-t border-gray-200 relative bg-white">
-      <div className="absolute right-0 top-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[100px] pointer-events-none -z-10" />
-      
-      <div className="max-w-5xl mx-auto">
-        <SectionHeading 
-          title="Technical Skills" 
-          subtitle="Technologies and tools I use to build robust software." 
-        />
+    <section id="skills" className="py-24 px-6 md:px-12 lg:px-24 bg-background relative overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-16">
+          <h2 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-6 tracking-tight">
+            Technical <span className="text-gradient">Arsenal.</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl">
+            A comprehensive list of technologies and tools I've mastered.
+          </p>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {skillCategories.map((category, idx) => (
             <motion.div 
               key={idx}
@@ -41,20 +55,20 @@ export default function Skills() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="bg-gray-50 border border-gray-200 rounded-2xl p-8 hover:bg-gray-100 transition-colors shadow-sm"
+              className={`p-8 rounded-[2rem] bg-white border ${category.border} shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col`}
             >
-              <h3 className="text-xl font-heading font-semibold text-gray-900 mb-6 flex items-center gap-3">
-                <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  {idx + 1}
-                </span>
+              <div className={`w-16 h-16 rounded-2xl ${category.color} flex items-center justify-center mb-6`}>
+                {category.icon}
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 font-heading tracking-tight">
                 {category.title}
               </h3>
               
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 mt-auto">
                 {category.skills.map((skill, sIdx) => (
                   <span 
                     key={sIdx}
-                    className="px-4 py-2 rounded-full bg-white text-gray-700 text-sm border border-gray-200 hover:border-primary/50 hover:text-primary transition-colors cursor-default shadow-sm"
+                    className="px-4 py-2 rounded-xl bg-gray-50 text-gray-700 text-sm font-medium border border-gray-100"
                   >
                     {skill}
                   </span>

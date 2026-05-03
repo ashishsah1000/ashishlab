@@ -1,89 +1,84 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SectionHeading } from "./ui/SectionHeading";
+import { Briefcase, Building2 } from "lucide-react";
 
 const experiences = [
   {
     role: "R&D Software Engineer I",
     company: "Ideaforge Technology Ltd.",
     period: "04 Nov 2024 - Present",
-    location: "Bengaluru, Karnataka",
+    location: "Bengaluru, IN",
     description: [
-      "Working on Flyght Cloud, an all-in-one drone data management platform for drone-based mapping and 3D analytics.",
-      "Developed an end-to-end geospatial machine learning pipeline to detect stockpiles from high-resolution DEM data using Python.",
-      "Built multi-scale elevation differences, generated labeled datasets by rasterizing GeoJSON, and trained Random Forest classifiers with memory-efficient chunk processing.",
+      "Working on Flyght Cloud, an all-in-one drone data management platform for 3D analytics.",
+      "Developed an end-to-end geospatial machine learning pipeline to detect stockpiles from DEM data using Python.",
+      "Trained Random Forest classifiers with memory-efficient chunk processing by rasterizing GeoJSON.",
       "Created REST APIs in Rust Axum and developed user interfaces in React.js.",
-      "Integrated Three JS by customizing the Potree.js library to handle 3D models in the browser, and worked on CesiumJs to integrate the 3D company use cases.",
-      "Implemented Mission Planner web map drone viewer simulator using OpenLayers JS.",
-      "Lead frontend testing initiatives using JEST and auto-generation of unit test cases using LLM."
+      "Integrated Three JS with Potree.js and CesiumJs for 3D model processing.",
+      "Lead frontend testing initiatives using JEST and auto-generation of unit test cases."
     ]
   },
   {
     role: "Senior Associate",
     company: "Tata Steel",
     period: "04/2018 - 10/2024",
-    location: "Jamshedpur, Jharkhand",
+    location: "Jamshedpur, IN",
     description: [
       "Contributed to the development and maintenance of industrial-grade web applications.",
-      "Played a key role in creating and optimizing RESTful services using Node.js.",
-      "Co-developed an employee-facing e-learning platform using React.js, Node.js, and Express.js, delivering a smooth UX.",
-      "Translated wireframes and mockups into clean, semantic HTML/CSS code.",
-      "Followed best practices in coding standards, modular design, and test-driven development.",
-      "Won First prize for web development at Nationals and multiple Gold Medals at Tata Ideas for developing app prototypes."
+      "Created and optimized RESTful services using Node.js.",
+      "Co-developed an employee-facing e-learning platform using React.js and Express.js.",
+      "Won First prize for web development at Nationals and multiple Gold Medals at Tata Ideas."
     ]
   }
 ];
 
 export default function Experience() {
   return (
-    <section id="experience" className="py-20 px-6 md:px-12 lg:px-24 border-t border-gray-200 bg-background">
-      <div className="max-w-4xl mx-auto">
-        <SectionHeading 
-          title="Work Experience" 
-          subtitle="My professional journey and roles." 
-        />
+    <section id="experience" className="py-24 px-6 md:px-12 lg:px-24 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-16">
+          <h2 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-6 tracking-tight">
+            Work <span className="text-gradient">Experience.</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl">
+            A track record of building robust systems at scale.
+          </p>
+        </div>
         
-        <div className="mt-16 space-y-12">
+        <div className="space-y-8">
           {experiences.map((exp, idx) => (
             <motion.div 
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.2 }}
-              className="relative pl-8 md:pl-0"
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="bg-white/60 backdrop-blur-xl border border-gray-100 shadow-sm p-8 md:p-10 rounded-[2.5rem] relative overflow-hidden bg-gray-50 group hover:border-gray-300"
             >
-              <div className="md:grid md:grid-cols-5 md:gap-8 items-start">
-                <div className="hidden md:block col-span-1 pt-1 text-gray-500 text-sm text-right font-semibold">
-                  {exp.period}
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="p-3 bg-white rounded-xl shadow-sm text-gray-900">
+                      {idx === 0 ? <Briefcase className="w-6 h-6" /> : <Building2 className="w-6 h-6" />}
+                    </span>
+                    <h3 className="text-2xl font-bold text-gray-900 font-heading">{exp.role}</h3>
+                  </div>
+                  <p className="text-xl font-medium text-gray-600 pl-14">{exp.company}</p>
                 </div>
-                
-                <div className="md:col-span-4 relative border-l-2 border-gray-200 pl-8 pb-8">
-                  {/* Timeline dot */}
-                  <div className="absolute w-4 h-4 rounded-full bg-primary -left-[9px] top-1 ring-4 ring-background" />
-                  
-                  <div className="md:hidden text-primary text-sm font-semibold mb-2">
-                    {exp.period}
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold text-gray-900 mb-1">{exp.role}</h3>
-                  <div className="text-lg text-gray-700 font-medium mb-4 flex items-center gap-2">
-                    <span>{exp.company}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-500 text-sm">{exp.location}</span>
-                  </div>
-                  
-                  <ul className="space-y-3 text-gray-600">
-                    {exp.description.map((item, i) => (
-                      <li key={i} className="flex gap-3">
-                        <span className="text-primary mt-1.5 font-bold">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="flex flex-row md:flex-col gap-2 items-center md:items-end text-sm font-semibold text-gray-500 uppercase tracking-widest pl-14 md:pl-0">
+                  <span className="bg-white px-4 py-2 rounded-lg shadow-sm">{exp.period}</span>
+                  <span className="bg-gray-100 px-4 py-2 rounded-lg">{exp.location}</span>
                 </div>
               </div>
+              
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-14 text-gray-700">
+                {exp.description.map((item, i) => (
+                  <li key={i} className="flex gap-3 items-start bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <span className="text-primary mt-1">•</span>
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </motion.div>
           ))}
         </div>
