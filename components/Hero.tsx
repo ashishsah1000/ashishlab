@@ -27,7 +27,7 @@ export default function Hero() {
               Available for new opportunities
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-heading font-black tracking-tight text-gray-900 mb-6 leading-[1.1]">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-black tracking-tight text-gray-900 mb-6 leading-[1.1]">
               Beyond <span className="inline-flex items-center gap-2 md:gap-4">Mountains and</span><br />
               <span className="text-gradient inline-flex items-center gap-2 md:gap-4"> Cosmos. </span>
             </h1>

@@ -133,7 +133,7 @@ export default function Highlights() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className={`w-[280px] md:w-[320px] lg:w-[340px] snap-center shrink-0 p-8 rounded-3xl border shadow-sm hover:shadow-xl transition-all duration-300 ${item.color} bg-opacity-50 backdrop-blur-sm whitespace-normal`}
+              className={`w-[320px] md:w-[320px] lg:w-[340px] snap-center shrink-0 p-8 rounded-3xl border shadow-sm hover:shadow-xl transition-all duration-300 ${item.color} bg-opacity-50 backdrop-blur-sm whitespace-normal`}
             >
               <div className="bg-white w-16 h-16 rounded-2xl flex items-center justify-center shadow-sm mb-6 border border-white/50">
                 {item.icon}

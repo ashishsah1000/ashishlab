@@ -4,13 +4,13 @@ import { motion } from "framer-motion";
 
 export default function About() {
   return (
-    <section id="about" className="py-24 px-6 md:px-12 lg:px-24 bg-white relative">
+    <section id="about" className="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-background relative overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-16">
+        <div className="mb-12 md:mb-16">
           <h2 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-6 tracking-tight">
             Behind the <span className="text-gradient">Code.</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl">
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl">
             Passionate about mathematics, algorithms, and beautiful interfaces. I thrive on building tools that empower industries.
           </p>
         </div>

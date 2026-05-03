@@ -6,7 +6,7 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-24 px-6 md:px-12 lg:px-24 bg-gray-900 text-white relative overflow-hidden">
+    <section id="contact" className="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-500/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50 pointer-events-none" />
       
       <div className="max-w-6xl mx-auto relative z-10">
@@ -16,10 +16,10 @@ export default function Contact() {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto"
         >
-          <h2 className="text-5xl md:text-7xl font-heading font-black mb-8 tracking-tight">
-            Let's build something <span className="text-blue-400">extraordinary.</span>
+          <h2 className="text-4xl md:text-5xl lg:text-7xl font-heading font-black mb-6 md:mb-8 tracking-tight">
+            Let's build something <br className="hidden md:block"/> <span className="text-blue-400">extraordinary.</span>
           </h2>
-          <p className="text-xl text-gray-400 mb-12 leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-400 mb-10 md:mb-12 leading-relaxed">
             I'm currently looking for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!
           </p>
           
@@ -41,8 +41,8 @@ export default function Contact() {
           </div>
         </motion.div>
         
-        <div className="mt-32 pt-10 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-gray-500 font-medium">
+        <div className="mt-20 md:mt-32 pt-8 md:pt-10 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <p className="text-gray-500 font-medium text-sm md:text-base">
             © {new Date().getFullYear()} Ashish Sah. All rights reserved.
           </p>
           

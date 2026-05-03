@@ -26,9 +26,9 @@ const projects = [
 
 export default function Projects() {
   return (
-    <section id="projects" className="py-24 px-6 md:px-12 lg:px-24 bg-background relative overflow-hidden">
+    <section id="projects" className="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-background relative overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-16 md:flex justify-between items-end">
+        <div className="mb-12 md:mb-16 md:flex justify-between items-end">
           <div>
             <h2 className="text-4xl md:text-5xl font-heading font-black text-gray-900 mb-4 tracking-tight">
               Selected <span className="text-gradient">Works.</span>
@@ -50,11 +50,11 @@ export default function Projects() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className={`group relative rounded-[2rem] p-8 md:p-10 ${project.color} border ${project.borderColor} overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-xl`}
+              className={`group relative rounded-3xl md:rounded-[2rem] p-6 md:p-10 ${project.color} border ${project.borderColor} overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-xl`}
             >
               <div className="relative z-10 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-8">
-                  <h3 className="text-3xl font-bold text-gray-900 font-heading tracking-tight">
+                <div className="flex justify-between items-start mb-6 md:mb-8 gap-4">
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 font-heading tracking-tight">
                     {project.title}
                   </h3>
                   <a 
@@ -67,7 +67,7 @@ export default function Projects() {
                   </a>
                 </div>
                 
-                <p className="text-gray-700 text-lg mb-10 leading-relaxed flex-1">
+                <p className="text-gray-700 text-base md:text-lg mb-8 md:mb-10 leading-relaxed flex-1">
                   {project.description}
                 </p>
                 
