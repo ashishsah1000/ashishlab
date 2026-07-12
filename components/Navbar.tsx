@@ -36,6 +36,7 @@ export default function Navbar() {
             <Link href="/#experience" className="hover:text-gray-900 transition-colors">Experience</Link>
             <Link href="/#projects" className="hover:text-gray-900 transition-colors">Projects</Link>
             <Link href="/labnotes" className="hover:text-gray-900 transition-colors">Lab Notes</Link>
+            <Link href="/journals" className="hover:text-gray-900 transition-colors">Journals</Link>
           </div>
           
           <div className="hidden md:block">
@@ -67,6 +68,7 @@ export default function Navbar() {
           <Link href="/#experience" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Experience</Link>
           <Link href="/#projects" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Projects</Link>
           <Link href="/labnotes" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Lab Notes</Link>
+          <Link href="/journals" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Journals</Link>
           <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="mx-auto mt-4 px-8 py-3 bg-gray-900 text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-colors shadow-sm">
             Contact
           </Link>

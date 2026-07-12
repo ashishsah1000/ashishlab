@@ -7,17 +7,17 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { ArrowLeft } from "lucide-react";
 import { db } from "@/db";
-import { labnotes } from "@/db/schema/labnotes";
+import { journals } from "@/db/schema/journals";
 import { eq } from "drizzle-orm";
 
-export default async function LabNoteViewPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function JournalViewPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const noteId = parseInt(resolvedParams.id);
   if (isNaN(noteId)) {
     notFound();
   }
 
-  const notes = await db.select().from(labnotes).where(eq(labnotes.id, noteId));
+  const notes = await db.select().from(journals).where(eq(journals.id, noteId));
   const note = notes[0];
 
   if (!note) {
@@ -30,10 +30,10 @@ export default async function LabNoteViewPage({ params }: { params: Promise<{ id
       
       <article className="flex-1 max-w-3xl mx-auto w-full px-6 py-32">
         <Link 
-          href="/labnotes" 
+          href="/journals" 
           className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 mb-10 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Notes
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Journals
         </Link>
         
         <header className="mb-12">

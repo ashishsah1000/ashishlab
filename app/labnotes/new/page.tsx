@@ -1,6 +1,5 @@
 "use client";
 
-import { createLabnote } from "@/app/actions/labnotes";
 import Navbar from "@/components/Navbar";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +16,18 @@ export default function NewLabNotePage() {
     
     try {
       const formData = new FormData(e.currentTarget);
-      await createLabnote(formData);
+      const data = Object.fromEntries(formData.entries());
+      
+      const res = await fetch("/api/labnotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to create note");
+      }
+      
       router.push("/labnotes");
       router.refresh();
     } catch (error) {
