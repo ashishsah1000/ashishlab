@@ -33,7 +33,15 @@ export async function GET(
       return NextResponse.json({ error: "Journal not found" }, { status: 404 });
     }
 
-    return NextResponse.json(entries[0]);
+    const entry = entries[0];
+
+    if (entry.visibility === "private" || entry.visibility === "link_only") {
+      if (!(await verifyAuth(request))) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
+    return NextResponse.json(entry);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to fetch journal" }, { status: 500 });

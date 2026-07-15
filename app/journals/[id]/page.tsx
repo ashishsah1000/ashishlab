@@ -38,7 +38,7 @@ export default async function JournalViewPage({ params }: { params: Promise<{ id
     } catch (e) {}
   }
 
-  if (note.visibility === "private" && !isLoggedIn) {
+  if ((note.visibility === "private" || note.visibility === "link_only") && !isLoggedIn) {
     notFound();
   }
 

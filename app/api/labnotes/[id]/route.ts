@@ -33,7 +33,15 @@ export async function GET(
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
-    return NextResponse.json(notes[0]);
+    const note = notes[0];
+
+    if (note.visibility === "private" || note.visibility === "link_only") {
+      if (!(await verifyAuth(request))) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
+    return NextResponse.json(note);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to fetch lab note" }, { status: 500 });
