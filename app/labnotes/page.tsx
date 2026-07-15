@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import { db } from "@/db";
 import { labnotes } from "@/db/schema/labnotes";
-import { desc, ilike, or } from "drizzle-orm";
+import { desc, ilike, or, eq, and } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
