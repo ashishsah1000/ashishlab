@@ -10,6 +10,8 @@ export const journals = pgTable("journals", {
   isFlow: boolean("is_flow").default(false),
   isDraft: boolean("is_draft").default(false),
   flowState: jsonb("flow_state"),
+  visibility: varchar("visibility", { length: 20 }).default("public").notNull(),
+  shareToken: varchar("share_token", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

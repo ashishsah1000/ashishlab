@@ -7,38 +7,22 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { ArrowLeft } from "lucide-react";
 import { db } from "@/db";
-import { labnotes } from "@/db/schema/labnotes";
-import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
-import PostActions from "@/components/PostActions";
+import { journals } from "@/db/schema/journals";
+import { eq, and } from "drizzle-orm";
 
-export default async function LabNoteViewPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function SharedJournalViewPage({ params }: { params: Promise<{ uuid: string }> }) {
   const resolvedParams = await params;
-  const noteId = parseInt(resolvedParams.id);
-  if (isNaN(noteId)) {
-    notFound();
-  }
+  const { uuid } = resolvedParams;
 
-  const notes = await db.select().from(labnotes).where(eq(labnotes.id, noteId));
+  const notes = await db.select().from(journals).where(
+    and(
+      eq(journals.shareToken, uuid),
+      eq(journals.visibility, "link_only")
+    )
+  );
   const note = notes[0];
 
   if (!note) {
-    notFound();
-  }
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-  let isLoggedIn = false;
-  
-  if (token) {
-    try {
-      await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "default_unsafe_secret"));
-      isLoggedIn = true;
-    } catch (e) {}
-  }
-
-  if (note.visibility === "private" && !isLoggedIn) {
     notFound();
   }
 
@@ -48,16 +32,19 @@ export default async function LabNoteViewPage({ params }: { params: Promise<{ id
       
       <article className="flex-1 max-w-3xl mx-auto w-full px-6 py-32">
         <Link 
-          href="/labnotes" 
+          href="/journals" 
           className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 mb-10 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Notes
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Journals
         </Link>
         
         <header className="mb-12">
           <div className="flex flex-wrap items-center gap-4 mb-6">
             <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
               {format(new Date(note.createdAt), "MMMM dd, yyyy")}
+            </span>
+            <span className="text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-100">
+              Shared Privately
             </span>
             {note.tags && (
               <div className="flex gap-2">
@@ -95,10 +82,6 @@ export default async function LabNoteViewPage({ params }: { params: Promise<{ id
             {note.content}
           </ReactMarkdown>
         </div>
-
-        {isLoggedIn && (
-          <PostActions id={note.id} type="labnotes" initialVisibility={note.visibility} initialShareToken={note.shareToken} />
-        )}
       </article>
     </main>
   );

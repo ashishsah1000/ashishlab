@@ -9,6 +9,9 @@ import { ArrowLeft } from "lucide-react";
 import { db } from "@/db";
 import { journals } from "@/db/schema/journals";
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+import PostActions from "@/components/PostActions";
 
 export default async function JournalViewPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -21,6 +24,21 @@ export default async function JournalViewPage({ params }: { params: Promise<{ id
   const note = notes[0];
 
   if (!note) {
+    notFound();
+  }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  let isLoggedIn = false;
+  
+  if (token) {
+    try {
+      await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "default_unsafe_secret"));
+      isLoggedIn = true;
+    } catch (e) {}
+  }
+
+  if (note.visibility === "private" && !isLoggedIn) {
     notFound();
   }
 
@@ -77,6 +95,10 @@ export default async function JournalViewPage({ params }: { params: Promise<{ id
             {note.content}
           </ReactMarkdown>
         </div>
+
+        {isLoggedIn && (
+          <PostActions id={note.id} type="journals" initialVisibility={note.visibility} initialShareToken={note.shareToken} />
+        )}
       </article>
     </main>
   );

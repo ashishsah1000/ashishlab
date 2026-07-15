@@ -8,6 +8,22 @@ import { Menu, X } from "lucide-react";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me").then(res => res.json()).then(data => {
+      if (data.user) setIsLoggedIn(true);
+    }).catch(console.error);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,10 +55,15 @@ export default function Navbar() {
             <Link href="/journals" className="hover:text-gray-900 transition-colors">Journals</Link>
           </div>
           
-          <div className="hidden md:block">
+          <div className="hidden md:flex gap-4">
             <Link href="/#contact" className="px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm">
               Contact
             </Link>
+            {isLoggedIn && (
+              <button onClick={handleLogout} className="px-5 py-2 bg-red-50 text-red-600 rounded-full text-sm font-semibold hover:bg-red-100 transition-colors shadow-sm">
+                Logout
+              </button>
+            )}
           </div>
 
           <button 
@@ -69,9 +90,14 @@ export default function Navbar() {
           <Link href="/#projects" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Projects</Link>
           <Link href="/labnotes" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Lab Notes</Link>
           <Link href="/journals" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Journals</Link>
-          <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="mx-auto mt-4 px-8 py-3 bg-gray-900 text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-colors shadow-sm">
+          <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="mx-auto mt-2 px-8 py-3 bg-gray-900 text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-colors shadow-sm">
             Contact
           </Link>
+          {isLoggedIn && (
+            <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="mx-auto mt-2 px-8 py-3 bg-red-50 text-red-600 rounded-full text-base font-semibold hover:bg-red-100 transition-colors shadow-sm">
+              Logout
+            </button>
+          )}
         </motion.div>
       )}
     </AnimatePresence>

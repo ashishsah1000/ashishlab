@@ -58,7 +58,7 @@ export default function NewJournalPage() {
     }
   };
 
-  const handleSaveDraft = async (nodes: any[], edges: any[], password: string) => {
+  const handleSaveDraft = async (nodes: any[], edges: any[]) => {
     // Basic draft save logic
     try {
       const res = await fetch("/api/journals", {
@@ -67,7 +67,6 @@ export default function NewJournalPage() {
         body: JSON.stringify({
           title: "Draft Flow",
           content: "Flow Draft",
-          password,
           isFlow: true,
           isDraft: true,
           flowState: { nodes, edges }
@@ -221,6 +220,20 @@ export default function NewJournalPage() {
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label htmlFor="visibility" className="block text-sm font-semibold text-gray-900">Visibility</label>
+                <select 
+                  id="visibility" 
+                  name="visibility" 
+                  defaultValue="public"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="public">Public - Visible to everyone</option>
+                  <option value="link_only">Link Only - Visible to anyone with the link</option>
+                  <option value="private">Private - Only visible to you</option>
+                </select>
+              </div>
             </div>
 
             <div className="space-y-2 pt-4">
@@ -239,18 +252,7 @@ export default function NewJournalPage() {
               />
             </div>
 
-            <div className="pt-6 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="w-full md:w-64 space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-900">Admin Password <span className="text-red-500">*</span></label>
-                <input 
-                  type="password" 
-                  id="password" 
-                  name="password" 
-                  required
-                  placeholder="Enter password to publish" 
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
-              </div>
+            <div className="pt-6 border-t border-gray-100 flex flex-col md:flex-row items-center justify-end gap-4">
               <button 
                 type="submit" 
                 disabled={loading}

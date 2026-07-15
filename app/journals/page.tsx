@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import { db } from "@/db";
 import { journals } from "@/db/schema/journals";
 import { desc, ilike, or, eq, and } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 
 export default async function JournalsPage({
   searchParams,
@@ -12,12 +14,28 @@ export default async function JournalsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams?.q || "";
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  let isLoggedIn = false;
+  
+  if (token) {
+    try {
+      await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "default_unsafe_secret"));
+      isLoggedIn = true;
+    } catch (e) {
+      // Invalid token
+    }
+  }
   
   let notes = [];
+  const baseCondition = isLoggedIn 
+    ? eq(journals.isDraft, false)
+    : and(eq(journals.isDraft, false), eq(journals.visibility, "public"));
+    
   if (query) {
     notes = await db.select().from(journals).where(
       and(
-        eq(journals.isDraft, false),
+        baseCondition,
         or(
           ilike(journals.title, `%${query}%`),
           ilike(journals.content, `%${query}%`),
@@ -26,7 +44,7 @@ export default async function JournalsPage({
       )
     ).orderBy(desc(journals.createdAt));
   } else {
-    notes = await db.select().from(journals).where(eq(journals.isDraft, false)).orderBy(desc(journals.createdAt));
+    notes = await db.select().from(journals).where(baseCondition).orderBy(desc(journals.createdAt));
   }
 
   return (
@@ -57,12 +75,14 @@ export default async function JournalsPage({
                 </svg>
               </button>
             </form>
-            <Link 
-              href="/journals/new" 
-              className="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
-            >
-              New Journal
-            </Link>
+            {isLoggedIn && (
+              <Link 
+                href="/journals/new" 
+                className="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+              >
+                New Journal
+              </Link>
+            )}
           </div>
         </div>
 

@@ -26,7 +26,7 @@ export default function FlowMode({
 }: { 
   onClose: () => void, 
   onGenerateStory: (story: string) => void, 
-  onSaveDraft: (nodes: Node[], edges: Edge[], password: string) => void,
+  onSaveDraft: (nodes: Node[], edges: Edge[]) => void,
   initialNodes?: Node[],
   initialEdges?: Edge[]
 }) {
@@ -152,10 +152,7 @@ export default function FlowMode({
         </button>
         <button 
           onClick={() => {
-            const pwd = window.prompt("Enter admin password to save draft:");
-            if (pwd) {
-              onSaveDraft(nodes, edges, pwd);
-            }
+            onSaveDraft(nodes, edges);
           }}
           className="px-4 py-2 bg-white text-gray-700 font-medium rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition"
         >

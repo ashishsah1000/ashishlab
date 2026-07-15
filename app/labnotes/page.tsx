@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import { db } from "@/db";
 import { labnotes } from "@/db/schema/labnotes";
 import { desc, ilike, or } from "drizzle-orm";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 
 export default async function LabNotesPage({
   searchParams,
@@ -12,18 +14,39 @@ export default async function LabNotesPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const query = resolvedSearchParams?.q || "";
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  let isLoggedIn = false;
+  
+  if (token) {
+    try {
+      await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "default_unsafe_secret"));
+      isLoggedIn = true;
+    } catch (e) {
+      // Invalid token
+    }
+  }
   
   let notes = [];
+  const baseCondition = isLoggedIn 
+    ? undefined
+    : eq(labnotes.visibility, "public");
+
   if (query) {
-    notes = await db.select().from(labnotes).where(
-      or(
-        ilike(labnotes.title, `%${query}%`),
-        ilike(labnotes.content, `%${query}%`),
-        ilike(labnotes.tags, `%${query}%`)
-      )
-    ).orderBy(desc(labnotes.createdAt));
+    const searchCondition = or(
+      ilike(labnotes.title, `%${query}%`),
+      ilike(labnotes.content, `%${query}%`),
+      ilike(labnotes.tags, `%${query}%`)
+    );
+    
+    const condition = baseCondition ? and(baseCondition, searchCondition) : searchCondition;
+    notes = await db.select().from(labnotes).where(condition).orderBy(desc(labnotes.createdAt));
   } else {
-    notes = await db.select().from(labnotes).orderBy(desc(labnotes.createdAt));
+    if (baseCondition) {
+      notes = await db.select().from(labnotes).where(baseCondition).orderBy(desc(labnotes.createdAt));
+    } else {
+      notes = await db.select().from(labnotes).orderBy(desc(labnotes.createdAt));
+    }
   }
 
   return (
@@ -54,12 +77,14 @@ export default async function LabNotesPage({
                 </svg>
               </button>
             </form>
-            <Link 
-              href="/labnotes/new" 
-              className="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
-            >
-              New Note
-            </Link>
+            {isLoggedIn && (
+              <Link 
+                href="/labnotes/new" 
+                className="px-6 py-3 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition shadow-sm whitespace-nowrap"
+              >
+                New Note
+              </Link>
+            )}
           </div>
         </div>
 
