@@ -97,7 +97,7 @@ export default async function LabNoteViewPage({ params }: { params: Promise<{ id
         </div>
 
         {isLoggedIn && (
-          <PostActions id={note.id} type="labnotes" initialVisibility={note.visibility} initialShareToken={note.shareToken} />
+          <PostActions id={note.id} type="labnotes" initialVisibility={note.visibility} initialShareToken={note.shareToken} title={note.title} />
         )}
       </article>
     </main>

@@ -5,13 +5,21 @@ import { jwtVerify } from "jose";
 const JWT_SECRET = process.env.JWT_SECRET || "default_unsafe_secret";
 
 // Define the routes that need to be protected
-const protectedRoutes = ["/journals/new", "/labnotes/new"];
+const protectedRoutes = [
+  "/journals/new",
+  "/labnotes/new",
+  "/goals",
+  "/create/goal",
+  "/weekly/goals",
+  "/goal",
+  "/overview/goals",
+];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Check if the route is protected
-  const isProtected = protectedRoutes.some(route => path.startsWith(route));
+  const isProtected = protectedRoutes.some(route => path === route || path.startsWith(route + "/"));
 
   if (isProtected) {
     const token = request.cookies.get("token")?.value;
@@ -39,5 +47,13 @@ export const config = {
   matcher: [
     "/journals/new/:path*",
     "/labnotes/new/:path*",
+    "/goals/:path*",
+    "/goals",
+    "/create/goal/:path*",
+    "/create/goal",
+    "/weekly/goals/:path*",
+    "/weekly/goals",
+    "/goal/:path*",
+    "/overview/goals/:path*",
   ],
 };

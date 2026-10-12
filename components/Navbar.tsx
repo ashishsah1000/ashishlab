@@ -40,7 +40,7 @@ export default function Navbar() {
       animate={{ y: 0 }}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? "py-4" : "py-6"}`}
     >
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="w-[92%] md:w-[85%] lg:w-[80%] mx-auto px-2">
         <div className={`flex items-center justify-between px-6 py-4 rounded-full transition-all duration-300 ${scrolled ? "bg-white/60 backdrop-blur-xl border border-white/50 shadow-lg shadow-gray-200/50" : "bg-transparent"}`}>
           <Link href="/" className="font-heading font-black text-xl tracking-tight text-gray-900">
             A<span className="text-blue-600">.</span>
@@ -53,6 +53,12 @@ export default function Navbar() {
             <Link href="/#projects" className="hover:text-gray-900 transition-colors">Projects</Link>
             <Link href="/labnotes" className="hover:text-gray-900 transition-colors">Lab Notes</Link>
             <Link href="/journals" className="hover:text-gray-900 transition-colors">Journals</Link>
+            {isLoggedIn && (
+              <Link href="/goals" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                Goals
+              </Link>
+            )}
           </div>
           
           <div className="hidden md:flex gap-4">
@@ -90,6 +96,12 @@ export default function Navbar() {
           <Link href="/#projects" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Projects</Link>
           <Link href="/labnotes" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Lab Notes</Link>
           <Link href="/journals" onClick={() => setMobileMenuOpen(false)} className="text-gray-900 font-medium py-2 text-lg">Journals</Link>
+          {isLoggedIn && (
+            <Link href="/goals" onClick={() => setMobileMenuOpen(false)} className="text-blue-600 font-bold py-2 text-lg flex items-center justify-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+              Goals
+            </Link>
+          )}
           <Link href="/#contact" onClick={() => setMobileMenuOpen(false)} className="mx-auto mt-2 px-8 py-3 bg-gray-900 text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-colors shadow-sm">
             Contact
           </Link>

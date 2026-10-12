@@ -3,33 +3,36 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Eye } from "lucide-react";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 
 export default function PostActions({ 
   id, 
   type, 
   initialVisibility,
-  initialShareToken
+  initialShareToken,
+  title
 }: { 
   id: number; 
   type: "journals" | "labnotes"; 
   initialVisibility: string;
   initialShareToken: string | null;
+  title?: string;
 }) {
   const router = useRouter();
   const [visibility, setVisibility] = useState(initialVisibility);
   const [shareToken, setShareToken] = useState(initialShareToken);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-    
+  const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/${type}/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
+        setShowDeleteModal(false);
         router.push(`/${type}`);
         router.refresh();
       } else {
@@ -93,12 +96,13 @@ export default function PostActions({
         </div>
 
         <button
-          onClick={handleDelete}
+          type="button"
+          onClick={() => setShowDeleteModal(true)}
           disabled={isDeleting}
           className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-red-50 text-red-600 font-semibold rounded-xl hover:bg-red-100 transition-colors shadow-sm disabled:opacity-50"
         >
           <Trash2 className="w-4 h-4" />
-          {isDeleting ? "Deleting..." : "Delete Post"}
+          <span>Delete Post</span>
         </button>
       </div>
 
@@ -124,6 +128,24 @@ export default function PostActions({
             </button>
           </div>
         </div>
+      )}
+
+      {showDeleteModal && (
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleConfirmDelete}
+          itemType={type === "journals" ? "Journal Entry" : "Lab Note"}
+          itemName={title || `${type === "journals" ? "Journal Entry" : "Lab Note"} #${id}`}
+          details={[
+            { label: "Visibility", value: visibility.toUpperCase() },
+            { label: "Record ID", value: `#${id}` },
+          ]}
+          warningMessage={`Deleting this ${type === "journals" ? "journal entry" : "lab note"} will permanently erase its content and any public share link.`}
+          confirmCheckboxLabel={`I confirm that I want to delete this ${type === "journals" ? "journal" : "note"} and understand this is permanent.`}
+          deleteButtonText="Delete Post"
+          isDeleting={isDeleting}
+        />
       )}
     </div>
   );

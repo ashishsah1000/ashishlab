@@ -97,7 +97,7 @@ export default async function JournalViewPage({ params }: { params: Promise<{ id
         </div>
 
         {isLoggedIn && (
-          <PostActions id={note.id} type="journals" initialVisibility={note.visibility} initialShareToken={note.shareToken} />
+          <PostActions id={note.id} type="journals" initialVisibility={note.visibility} initialShareToken={note.shareToken} title={note.title} />
         )}
       </article>
     </main>

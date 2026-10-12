@@ -28,7 +28,7 @@ Here is the sequence of their thoughts, the AI's critiques, and the final conclu
 
 ${formattedThoughts}
 
-Using this flow, please write a cohesive, creative story of self-exploration, experience, and realization. The story should read like a beautifully written journal entry (in the first-person perspective, as if the user is writing it). Format the output in Markdown. Make it evocative and insightful. Do not use very difficult english words. We have to tell the story in an effective way.`;
+Using this flow, please write a cohesive, creative story of self-exploration, experience, and realization. The story should read like a beautifully written journal entry (in the first-person perspective, as if the user is writing it). Format the output in Markdown. Make it evocative and insightful. Do not use very difficult english words. Tell the story in an creative and effective way.`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
