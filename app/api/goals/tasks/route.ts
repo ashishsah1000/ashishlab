@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const start = searchParams.get("start");
   const end = searchParams.get("end");
   const goalId = searchParams.get("goalId");
+  const status = searchParams.get("status");
 
   try {
     const conditions = [eq(goalTasks.userId, user.userId)];
@@ -26,6 +27,9 @@ export async function GET(request: NextRequest) {
     }
     if (goalId) {
       conditions.push(eq(goalTasks.goalId, parseInt(goalId)));
+    }
+    if (status && (status === "pending" || status === "completed" || status === "skipped")) {
+      conditions.push(eq(goalTasks.status, status));
     }
 
     const tasksList = await db

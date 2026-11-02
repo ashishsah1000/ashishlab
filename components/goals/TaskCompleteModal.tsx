@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Circle, Clock, Sparkles, X, FileText, Lock, AlertCircle } from "lucide-react";
+import { CheckCircle2, Circle, Clock, Sparkles, X, FileText, Lock, AlertCircle, Lightbulb, ListChecks, Flag, Target, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { parseTaskPlan } from "@/lib/weeklyPlan";
 
 interface TaskItem {
   id: number;
@@ -23,19 +24,25 @@ interface TaskCompleteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved: (updatedTask: TaskItem) => void;
+  onNextSuggestion?: (nextTaskId: number, aiSuggestion: string) => void;
 }
 
-export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: TaskCompleteModalProps) {
+export default function TaskCompleteModal({ task, isOpen, onClose, onSaved, onNextSuggestion }: TaskCompleteModalProps) {
   const [status, setStatus] = useState<"pending" | "completed">("pending");
   const [actualMinutes, setActualMinutes] = useState("30");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
+  const [nextSuggestion, setNextSuggestion] = useState<{ date: string; text: string } | null>(null);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
 
   useEffect(() => {
     if (task) {
       setStatus(task.status === "completed" ? "completed" : "pending");
       setActualMinutes(String(task.actualMinutes || task.estimatedMinutes || 30));
       setNotes(task.completionNotes || "");
+      setNextSuggestion(null);
+      setSuggestError(null);
     }
   }, [task]);
 
@@ -45,6 +52,7 @@ export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: Ta
   const isFutureTask = task.date > todayStr;
   const isPastTask = task.date < todayStr;
   const isTodayTask = task.date === todayStr;
+  const plan = parseTaskPlan(task.aiSuggestion);
 
   const handleSave = async () => {
     if (isFutureTask) return;
@@ -73,6 +81,27 @@ export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: Ta
     }
   };
 
+  // AI runs only when the user asks for it
+  const handleSuggestNext = async () => {
+    setSuggesting(true);
+    setSuggestError(null);
+    try {
+      const res = await fetch(`/api/goals/tasks/${task.id}/next-suggestion`, { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSuggestError(data.error || "Failed to generate suggestion");
+        return;
+      }
+      setNextSuggestion({ date: data.nextTask.date, text: data.nextTask.aiSuggestion });
+      onNextSuggestion?.(data.nextTask.id, data.nextTask.aiSuggestion);
+    } catch (e) {
+      console.error(e);
+      setSuggestError("Failed to generate suggestion");
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
@@ -80,7 +109,7 @@ export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: Ta
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100"
+          className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-100"
         >
           {/* Header */}
           <div className="p-6 bg-gray-900 text-white flex items-start justify-between">
@@ -130,8 +159,61 @@ export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: Ta
             </div>
           )}
 
-          {/* AI Daily Suggestion Box */}
-          {task.aiSuggestion && (
+          {/* AI Weekly Plan for this day (structured) */}
+          {plan && (
+            <div className="mx-6 mt-4 p-4 bg-blue-50/70 border border-blue-200/60 rounded-2xl text-xs space-y-3">
+              <div className="flex items-start gap-2.5">
+                <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-blue-900 block mb-0.5">AI Suggestion: What to achieve</span>
+                  <span className="text-blue-900 leading-relaxed">{plan.focus}</span>
+                </div>
+              </div>
+
+              {plan.why && (
+                <div className="pl-6.5">
+                  <span className="font-bold text-blue-900 flex items-center gap-1 mb-0.5">
+                    <Lightbulb className="w-3.5 h-3.5" /> Why this, why now
+                  </span>
+                  <p className="text-blue-800 leading-relaxed">{plan.why}</p>
+                </div>
+              )}
+
+              {plan.steps.length > 0 && (
+                <div className="pl-6.5">
+                  <span className="font-bold text-blue-900 flex items-center gap-1 mb-1">
+                    <ListChecks className="w-3.5 h-3.5" /> Steps
+                  </span>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-blue-800 leading-relaxed">
+                    {plan.steps.map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {plan.deliverable && (
+                <div className="pl-6.5">
+                  <span className="font-bold text-blue-900 flex items-center gap-1 mb-0.5">
+                    <Flag className="w-3.5 h-3.5" /> Done when
+                  </span>
+                  <p className="text-blue-800 leading-relaxed">{plan.deliverable}</p>
+                </div>
+              )}
+
+              {plan.weekTarget && (
+                <div className="pt-2.5 border-t border-blue-200/70 flex items-start gap-1.5 text-[11px] text-blue-700">
+                  <Target className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>
+                    <span className="font-bold">This week&apos;s target:</span> {plan.weekTarget}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* AI Daily Suggestion Box (legacy plain-text suggestion) */}
+          {!plan && task.aiSuggestion && (
             <div className="mx-6 mt-4 p-3.5 bg-blue-50/70 border border-blue-200/60 rounded-2xl flex items-start gap-2.5 text-xs">
               <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
               <div>
@@ -229,10 +311,43 @@ export default function TaskCompleteModal({ task, isOpen, onClose, onSaved }: Ta
               <span className="text-[10px] text-gray-400 block mt-1">
                 {isFutureTask
                   ? "Editing is locked until this task's date arrives."
-                  : "AI will use these notes to recommend future targets!"}
+                  : "AI uses these notes when you generate a weekly plan or ask for a next-session suggestion."}
               </span>
             </div>
           </div>
+
+          {/* On-demand AI suggestion for the next session (completed tasks only) */}
+          {task.status === "completed" && (
+            <div className="mx-6 mb-5 p-3.5 rounded-2xl border border-gray-200 bg-gray-50/70 text-xs space-y-2">
+              {nextSuggestion ? (
+                <div className="flex items-start gap-2.5">
+                  <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-gray-900 block mb-0.5">
+                      Added to your {nextSuggestion.date} session:
+                    </span>
+                    <span className="text-gray-700 leading-relaxed">{nextSuggestion.text}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-gray-600 leading-relaxed">
+                    Want AI guidance for your next session based on these notes?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleSuggestNext}
+                    disabled={suggesting}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-gray-200 text-gray-800 hover:bg-gray-100 disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                  >
+                    {suggesting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-blue-600" />}
+                    <span>{suggesting ? "Thinking..." : "Suggest next session"}</span>
+                  </button>
+                </div>
+              )}
+              {suggestError && <p className="text-red-700 font-semibold">{suggestError}</p>}
+            </div>
+          )}
 
           {/* Footer */}
           <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-2">

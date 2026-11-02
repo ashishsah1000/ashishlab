@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RefreshCw, ArrowRight, Zap, Target } from "lucide-react";
 import Link from "next/link";
@@ -14,29 +14,29 @@ interface SuggestionData {
 
 export default function AiSuggestionBanner() {
   const [data, setData] = useState<SuggestionData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const fetchSuggestion = async () => {
     setLoading(true);
+    setError(false);
     try {
       const res = await fetch("/api/ai/daily-suggestion");
       if (res.ok) {
         const json = await res.json();
         setData(json);
+      } else {
+        setError(true);
       }
     } catch (e) {
       console.error(e);
+      setError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSuggestion();
-  }, []);
-
-  if (!loading && !data) return null;
-
+  // AI is only called when the user clicks; nothing is fetched on page load
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -49,7 +49,7 @@ export default function AiSuggestionBanner() {
 
         <div className="flex items-start gap-4 flex-1">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-inner mt-0.5">
-            <Sparkles className="w-5 h-5 text-white animate-pulse" />
+            <Sparkles className={`w-5 h-5 text-white ${loading ? "animate-pulse" : ""}`} />
           </div>
 
           <div className="space-y-1">
@@ -69,6 +69,12 @@ export default function AiSuggestionBanner() {
                 <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
                 <span>Analyzing your milestones and consistency...</span>
               </div>
+            ) : !data ? (
+              <p className="text-xs md:text-sm text-gray-300 font-light leading-relaxed">
+                {error
+                  ? "Couldn't get an insight right now. Please try again."
+                  : "Get a quick AI read on today's tasks and what to prioritize."}
+              </p>
             ) : (
               <>
                 <p className="text-sm md:text-base font-semibold text-gray-100 leading-snug">
@@ -83,14 +89,25 @@ export default function AiSuggestionBanner() {
         </div>
 
         <div className="flex items-center gap-2 self-end md:self-center shrink-0">
-          <button
-            onClick={fetchSuggestion}
-            disabled={loading}
-            title="Refresh Coach Insight"
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors border border-white/10"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-          </button>
+          {data ? (
+            <button
+              onClick={fetchSuggestion}
+              disabled={loading}
+              title="Refresh Coach Insight"
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors border border-white/10"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            </button>
+          ) : (
+            <button
+              onClick={fetchSuggestion}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors border border-white/15 disabled:opacity-50"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{loading ? "Thinking..." : "Get today's insight"}</span>
+            </button>
+          )}
 
           <Link
             href="/weekly/goals"

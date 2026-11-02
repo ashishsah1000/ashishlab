@@ -5,6 +5,7 @@ import { goalChatMessages, goals, milestones, goalTasks } from "@/db/schema/goal
 import { eq, and, desc, asc } from "drizzle-orm";
 import { format } from "date-fns";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL } from "@/lib/ai";
 
 const ai = process.env.GEMINI_API_KEY
   ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -129,7 +130,7 @@ User: ${message.trim()}
 Respond as the Coach directly:`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: contextPrompt,
     });
 

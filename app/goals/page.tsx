@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, Calendar, Gift, Mail, Target, ArrowRight, CheckCircle2, TrendingUp, Clock, AlertCircle, Trash2 } from "lucide-react";
+import { Plus, Calendar, Gift, Mail, Target, ArrowRight, CheckCircle2, TrendingUp, Clock, AlertCircle, Trash2, RotateCcw, AlertTriangle, Lock } from "lucide-react";
 import AiSuggestionBanner from "@/components/goals/AiSuggestionBanner";
 import GitMonthChart, { DayChartItem } from "@/components/goals/GitMonthChart";
 import RewardsStoreModal from "@/components/goals/RewardsStoreModal";
@@ -45,6 +45,68 @@ export default function GoalsDashboardPage() {
   const [attachModalGoal, setAttachModalGoal] = useState<GoalWithStats | null>(null);
   const [goalToDelete, setGoalToDelete] = useState<GoalWithStats | null>(null);
   const [isDeletingGoal, setIsDeletingGoal] = useState(false);
+
+  // Reinitialize goal tasks modal
+  const [goalToReinit, setGoalToReinit] = useState<GoalWithStats | null>(null);
+  const [reinitStats, setReinitStats] = useState<{ totalCount: number; pendingCount: number; milestonesCount: number } | null>(null);
+  const [isCheckingReinit, setIsCheckingReinit] = useState<number | null>(null);
+  const [isReiniting, setIsReiniting] = useState(false);
+  const [reinitConfirmed, setReinitConfirmed] = useState(false);
+  const [reinitResult, setReinitResult] = useState<string | null>(null);
+  const [reinitPassword, setReinitPassword] = useState("");
+  const [reinitPasswordError, setReinitPasswordError] = useState<string | null>(null);
+
+  const handleOpenGoalReinit = async (g: GoalWithStats) => {
+    setIsCheckingReinit(g.id);
+    setReinitResult(null);
+    setReinitConfirmed(false);
+    setReinitPassword("");
+    setReinitPasswordError(null);
+    try {
+      const res = await fetch(`/api/goals/${g.id}/reinitialize-tasks`);
+      if (res.ok) {
+        const data = await res.json();
+        setReinitStats({
+          totalCount: data.totalCount,
+          pendingCount: data.pendingCount,
+          milestonesCount: data.milestonesCount,
+        });
+        setGoalToReinit(g);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsCheckingReinit(null);
+    }
+  };
+
+  const handleConfirmGoalReinit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!goalToReinit || !reinitConfirmed || !reinitPassword.trim()) return;
+    setIsReiniting(true);
+    setReinitPasswordError(null);
+    try {
+      const res = await fetch(`/api/goals/${goalToReinit.id}/reinitialize-tasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: reinitPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setReinitResult(data.message);
+        setReinitConfirmed(false);
+        setReinitPassword("");
+        await fetchGoals();
+      } else {
+        setReinitPasswordError(data.error || "Password verification failed.");
+      }
+    } catch (e) {
+      console.error(e);
+      setReinitPasswordError("An unexpected error occurred.");
+    } finally {
+      setIsReiniting(false);
+    }
+  };
 
   const fetchGoals = async () => {
     setLoading(true);
@@ -269,9 +331,11 @@ export default function GoalsDashboardPage() {
                         </span>
                       </div>
 
-                      <h3 className="text-2xl font-black font-heading text-gray-900 tracking-tight">
-                        {goal.title}
-                      </h3>
+                      <Link href={`/goal/${goal.id}`}>
+                        <h3 className="text-2xl font-black font-heading text-gray-900 tracking-tight hover:text-blue-600 transition-colors cursor-pointer">
+                          {goal.title}
+                        </h3>
+                      </Link>
 
                       {goal.description && (
                         <p className="text-xs md:text-sm text-gray-500 leading-relaxed max-w-2xl">
@@ -295,6 +359,15 @@ export default function GoalsDashboardPage() {
                         <span>Deep Analytics</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGoalReinit(goal)}
+                        disabled={isCheckingReinit === goal.id}
+                        className="p-2 bg-gray-50 hover:bg-violet-50 text-gray-400 hover:text-violet-600 rounded-xl transition-colors border border-gray-200 hover:border-violet-200 disabled:opacity-50"
+                        title="Reinitialize all milestone weekday tasks from today"
+                      >
+                        <RotateCcw className={`w-4 h-4 ${isCheckingReinit === goal.id ? "animate-spin" : ""}`} />
+                      </button>
                       <button
                         type="button"
                         onClick={() => setGoalToDelete(goal)}
@@ -383,6 +456,137 @@ export default function GoalsDashboardPage() {
           deleteButtonText="Delete Goal"
           isDeleting={isDeletingGoal}
         />
+      )}
+
+      {/* Reinitialize Goal Tasks Modal */}
+      {goalToReinit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full border border-gray-100 shadow-2xl space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-2xl bg-violet-100 shrink-0">
+                <RotateCcw className="w-5 h-5 text-violet-700" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold font-heading text-gray-900">Reinitialize Goal Tasks</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{goalToReinit.title}</p>
+              </div>
+            </div>
+
+            {reinitResult ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-xs text-emerald-800 font-semibold">
+                ✅ {reinitResult}
+              </div>
+            ) : (
+              <>
+                {/* Current goal task stats */}
+                {reinitStats && (
+                  <div className="bg-gray-50 rounded-2xl p-4 space-y-2 border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-700">Goal Task History</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-center p-2 rounded-xl bg-white border border-gray-100">
+                        <p className="text-xl font-black text-gray-900">{reinitStats.milestonesCount}</p>
+                        <p className="text-[10px] text-gray-500 font-semibold">Milestones</p>
+                      </div>
+                      <div className="text-center p-2 rounded-xl bg-white border border-gray-100">
+                        <p className="text-xl font-black text-gray-900">{reinitStats.totalCount}</p>
+                        <p className="text-[10px] text-gray-500 font-semibold">Total Tasks</p>
+                      </div>
+                      <div className="text-center p-2 rounded-xl bg-white border border-gray-100">
+                        <p className={`text-xl font-black ${reinitStats.pendingCount === 0 ? "text-rose-600" : "text-blue-600"}`}>
+                          {reinitStats.pendingCount}
+                        </p>
+                        <p className="text-[10px] text-gray-500 font-semibold">Pending</p>
+                      </div>
+                    </div>
+                    {reinitStats.totalCount === 0 && (
+                      <div className="flex items-center gap-1.5 text-rose-600 text-xs font-semibold pt-1">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        No tasks found — tasks may not have been generated yet.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-800 leading-relaxed">
+                  <strong>What this does:</strong> Starts this goal fresh from today. Shifts the goal timeline ({goalToReinit.durationMonths ? `${goalToReinit.durationMonths} months` : "full duration"}) forward from today to a new deadline, clears all past task history, and regenerates fresh weekday (Mon–Fri) tasks across all milestones.
+                  <p className="mt-1 text-[11px] text-amber-700">
+                    💡 <em>Note: Tasks are scheduled for weekdays (Mon–Fri). If today is a weekend, the first task starts on Monday.</em>
+                  </p>
+                </div>
+
+                {/* Confirmation checkbox */}
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={reinitConfirmed}
+                    onChange={(e) => setReinitConfirmed(e.target.checked)}
+                    className="mt-0.5 accent-violet-600 w-4 h-4 shrink-0"
+                  />
+                  <span className="text-xs text-gray-600 leading-relaxed">
+                    I understand this will <strong>permanently delete all task history</strong> across all milestones in <strong>{goalToReinit.title}</strong> and start fresh from today.
+                  </span>
+                </label>
+
+                {/* Password Verification Field */}
+                <form onSubmit={handleConfirmGoalReinit} className="space-y-1.5 pt-1">
+                  <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
+                    <Lock className="w-3.5 h-3.5 text-violet-600" />
+                    <span>Enter Account Password to Verify *</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter your account password"
+                    value={reinitPassword}
+                    onChange={(e) => {
+                      setReinitPassword(e.target.value);
+                      if (reinitPasswordError) setReinitPasswordError(null);
+                    }}
+                    className={`w-full text-xs px-3.5 py-2.5 rounded-xl border bg-gray-50 focus:outline-none transition-all ${
+                      reinitPasswordError
+                        ? "border-rose-300 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                        : "border-gray-200 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-600"
+                    }`}
+                  />
+                  {reinitPasswordError && (
+                    <p className="text-[11px] font-bold text-rose-600 flex items-center gap-1 pt-0.5">
+                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                      {reinitPasswordError}
+                    </p>
+                  )}
+                </form>
+              </>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setGoalToReinit(null);
+                  setReinitStats(null);
+                  setReinitResult(null);
+                  setReinitConfirmed(false);
+                  setReinitPassword("");
+                  setReinitPasswordError(null);
+                }}
+                className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+              >
+                {reinitResult ? "Close" : "Cancel"}
+              </button>
+              {!reinitResult && (
+                <button
+                  type="button"
+                  onClick={handleConfirmGoalReinit}
+                  disabled={!reinitConfirmed || !reinitPassword.trim() || isReiniting}
+                  className="px-5 py-2 text-xs font-bold bg-violet-700 hover:bg-violet-600 text-white rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <RotateCcw className={`w-3.5 h-3.5 ${isReiniting ? "animate-spin" : ""}`} />
+                  {isReiniting ? "Verifying & Resetting..." : "Verify & Reinitialize"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

@@ -5,6 +5,7 @@ import { goals, milestones, goalTasks } from "@/db/schema/goals";
 import { eq, and, desc } from "drizzle-orm";
 import { format } from "date-fns";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL } from "@/lib/ai";
 
 const ai = process.env.GEMINI_API_KEY
   ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -87,7 +88,7 @@ Respond with STRICT JSON format without markdown code blocks:
 }`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
     });
 

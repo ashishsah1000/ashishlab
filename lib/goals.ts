@@ -119,10 +119,18 @@ export function buildMilestoneWeeklyMatrix(
 ) {
   const milestoneTasks = tasks.filter((t) => t.milestoneId === milestoneId);
   const now = new Date();
+  const todayStr = format(now, "yyyy-MM-dd");
   const weeks = [];
 
-  for (let i = weeksCount - 1; i >= 0; i--) {
-    const refDate = addDays(now, -i * 7);
+  const pastTasksCount = milestoneTasks.filter((t) => t.date < todayStr).length;
+
+  // If there is past task history, show historical weeks ending in the current week.
+  // If there is NO past history (e.g. freshly created or reset goal), show the upcoming schedule.
+  const startOffset = pastTasksCount > 0 ? -(weeksCount - 1) : 0;
+
+  for (let i = 0; i < weeksCount; i++) {
+    const weekIndex = startOffset + i;
+    const refDate = addDays(now, weekIndex * 7);
     const start = startOfWeek(refDate, { weekStartsOn: 1 }); // Monday
     const end = endOfWeek(refDate, { weekStartsOn: 1 }); // Sunday
     const startStr = format(start, "yyyy-MM-dd");
@@ -132,7 +140,7 @@ export function buildMilestoneWeeklyMatrix(
     const total = weekTasks.length;
     const completed = weekTasks.filter((t) => t.status === "completed").length;
     const rate = total > 0 ? (completed / total) * 100 : 0;
-    const isFuture = startStr > format(now, "yyyy-MM-dd");
+    const isFuture = startStr > todayStr;
 
     let status: "green" | "red" | "gray" = "gray";
     if (!isFuture) {

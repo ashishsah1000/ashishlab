@@ -5,6 +5,7 @@ import { goals, milestones, goalTasks } from "@/db/schema/goals";
 import { eq, and } from "drizzle-orm";
 import { calculateGoalDetailedAnalytics } from "@/lib/goals";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL } from "@/lib/ai";
 
 const ai = process.env.GEMINI_API_KEY
   ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -89,7 +90,7 @@ Please format the response in clean, beautiful Markdown with:
 Keep it practical, highly motivating, and tailored to the actual data provided.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
     });
 

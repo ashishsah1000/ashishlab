@@ -33,6 +33,9 @@ export default function MilestoneWeeklyChart({ weeks }: MilestoneWeeklyChartProp
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded bg-rose-500 inline-block" /> &lt;80%
           </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded bg-blue-100 border border-blue-400 inline-block" /> Scheduled
+          </span>
         </div>
       </div>
 
@@ -43,6 +46,8 @@ export default function MilestoneWeeklyChart({ weeks }: MilestoneWeeklyChartProp
             bg = "bg-emerald-500 text-white shadow-xs shadow-emerald-500/20";
           } else if (wk.status === "red") {
             bg = "bg-rose-500 text-white shadow-xs shadow-rose-500/20";
+          } else if (wk.isFuture && wk.total > 0) {
+            bg = "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100";
           }
 
           return (
@@ -63,6 +68,10 @@ export default function MilestoneWeeklyChart({ weeks }: MilestoneWeeklyChartProp
             <span className="font-bold">{hoveredWeek.weekLabel}</span>:{" "}
             {hoveredWeek.total === 0 ? (
               <span className="text-gray-400">No tasks</span>
+            ) : hoveredWeek.isFuture ? (
+              <span className="text-blue-300 font-semibold">
+                {hoveredWeek.total} tasks scheduled
+              </span>
             ) : (
               <span className={hoveredWeek.status === "green" ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
                 {hoveredWeek.completed}/{hoveredWeek.total} ({hoveredWeek.rate}%)

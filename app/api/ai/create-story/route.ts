@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL } from "@/lib/ai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -31,7 +32,7 @@ ${formattedThoughts}
 Using this flow, please write a cohesive, creative story of self-exploration, experience, and realization. The story should read like a beautifully written journal entry (in the first-person perspective, as if the user is writing it). Format the output in Markdown. Make it evocative and insightful. Do not use very difficult english words. Tell the story in an creative and effective way.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: GEMINI_MODEL,
       contents: prompt,
     });
 

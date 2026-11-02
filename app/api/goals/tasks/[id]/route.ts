@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUserFromRequest } from "@/lib/auth";
 import { db } from "@/db";
-import { goalTasks, milestones, goals } from "@/db/schema/goals";
-import { eq, and, gt } from "drizzle-orm";
-import { GoogleGenAI } from "@google/genai";
-
-const ai = process.env.GEMINI_API_KEY
-  ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-  : null;
+import { goalTasks } from "@/db/schema/goals";
+import { eq, and } from "drizzle-orm";
 
 export async function PATCH(
   request: NextRequest,
@@ -80,53 +75,6 @@ export async function PATCH(
       .set(updateData)
       .where(eq(goalTasks.id, taskId))
       .returning();
-
-    // If marked completed, generate AI suggestion for next pending task in this milestone
-    if (body.status === "completed" && ai) {
-      (async () => {
-        try {
-          const [milestone] = await db
-            .select()
-            .from(milestones)
-            .where(eq(milestones.id, existingTask.milestoneId));
-
-          const [nextTask] = await db
-            .select()
-            .from(goalTasks)
-            .where(
-              and(
-                eq(goalTasks.milestoneId, existingTask.milestoneId),
-                eq(goalTasks.status, "pending"),
-                gt(goalTasks.date, existingTask.date)
-              )
-            )
-            .limit(1);
-
-          if (milestone && nextTask) {
-            const prompt = `You are a high-performance goal mentor.
-The user completed their task on "${existingTask.date}" for topic "${milestone.topic}".
-Targets for this milestone: "${milestone.targets}".
-Desired outcome: "${milestone.endOutput}".
-User notes on what they accomplished: "${body.completionNotes || "Completed session"}".
-Write a punchy, 1-2 sentence actionable suggestion for tomorrow (${nextTask.date}) to advance the goal as fast as possible, along with words of motivation.`;
-
-            const response = await ai.models.generateContent({
-              model: "gemini-2.5-flash",
-              contents: prompt,
-            });
-
-            if (response.text) {
-              await db
-                .update(goalTasks)
-                .set({ aiSuggestion: response.text.trim() })
-                .where(eq(goalTasks.id, nextTask.id));
-            }
-          }
-        } catch (e) {
-          console.error("Async AI suggestion generation error:", e);
-        }
-      })();
-    }
 
     return NextResponse.json({ task: updatedTask });
   } catch (error) {

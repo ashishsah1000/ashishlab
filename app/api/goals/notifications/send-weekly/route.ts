@@ -7,6 +7,7 @@ import { eq, and, gte, lte } from "drizzle-orm";
 import { startOfWeek, endOfWeek, format } from "date-fns";
 import { sendGoalProgressEmail } from "@/lib/mailer";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL } from "@/lib/ai";
 
 const ai = process.env.GEMINI_API_KEY
   ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
         const prompt = `Write a 2-sentence encouraging coach advice for ${user.username} for their ${reportType} progress email. 
 Weekly completion rate: ${weeklyRate}%. Reward unlocked: ${isRewardUnlocked ? "YES" : "NO"}. Goals: ${activeGoals.map((g) => g.title).join(", ")}.`;
         const res = await ai.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: GEMINI_MODEL,
           contents: prompt,
         });
         if (res.text) aiAdvice = res.text.trim();
